@@ -1,0 +1,47 @@
+{
+  "name": "backtest-cow-vue",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vue-tsc -b && vite build",
+    "preview": "vite preview",
+    "lint": "eslint .",
+    "typecheck": "vue-tsc -b",
+    "test": "vitest run --coverage",
+    "test:e2e": "playwright test",
+    "data:update": "node ./scripts/data/update-data.mjs",
+    "data:validate": "node ./scripts/data/validate-data.mjs"
+  },
+  "dependencies": {
+    "dayjs": "^1.11.21",
+    "echarts": "^6.1.0",
+    "element-plus": "^2.14.1",
+    "pinia": "^3.0.4",
+    "vue": "^3.5.35",
+    "vue-echarts": "^8.0.1",
+    "vue-router": "^5.1.0",
+    "zod": "^4.4.3"
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "@playwright/test": "^1.60.0",
+    "@types/node": "^24.12.3",
+    "@vitejs/plugin-vue": "^6.0.6",
+    "@vitest/coverage-v8": "^4.1.8",
+    "@vue/test-utils": "^2.4.10",
+    "@vue/tsconfig": "^0.9.1",
+    "eslint": "^10.4.1",
+    "eslint-plugin-vue": "^10.9.1",
+    "jsdom": "^29.1.1",
+    "prettier": "^3.8.3",
+    "sass": "^1.100.0",
+    "typescript": "~6.0.2",
+    "typescript-eslint": "^8.60.1",
+    "vite": "^8.0.12",
+    "vite-plugin-checker": "^0.14.1",
+    "vitest": "^4.1.8",
+    "vue-tsc": "^3.2.8"
+  }
+}
