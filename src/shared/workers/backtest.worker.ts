@@ -1,18 +1,17 @@
-import type { BacktestParams, FxPoint, PricePoint } from '@/shared/types/domain'
+import type { BacktestDataset, BacktestParams, FxPoint } from '@/shared/types/domain'
 import { runBacktestEngine } from '@/shared/utils/backtest-engine'
 
 interface WorkerRequest {
   params: BacktestParams
-  series: PricePoint[]
+  dataset: BacktestDataset
   fxSeries: FxPoint[]
-  currency: 'USD' | 'CNY'
 }
 
 self.onmessage = (event: MessageEvent<WorkerRequest>) => {
-  const { params, series, fxSeries, currency } = event.data
+  const { params, dataset, fxSeries } = event.data
 
   try {
-    const result = runBacktestEngine(params, series, fxSeries, currency)
+    const result = runBacktestEngine(params, dataset, fxSeries)
     self.postMessage({ ok: true, result })
   } catch (error) {
     self.postMessage({

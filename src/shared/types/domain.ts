@@ -1,10 +1,23 @@
-export type IndexCode = 'SPX' | 'NDX' | 'DJI' | 'RUT' | 'CSI300' | 'CSI500'
+export type IndexCode =
+  | 'SPX'
+  | 'NDX'
+  | 'DJI'
+  | 'RUT'
+  | 'CSI300'
+  | 'CSI500'
+  | 'SHCOMP'
+  | 'SZCOMP'
+  | 'CHINEXT'
+  | 'STAR50'
+  | 'GOLD_ETF'
 export type StrategyKind = 'dca' | 'manual'
 export type Frequency = 'daily' | 'weekly' | 'biweekly' | 'monthly'
 export type AssetCurrency = 'USD' | 'CNY'
-export type DataSource = 'yahoo' | 'eastmoney'
+export type DataSource = 'yahoo' | 'eastmoney' | 'sina'
 export type TradingCalendar = 'US' | 'CN'
 export type ValidationStatus = 'ok' | 'warning' | 'error'
+export type DcaAllocationMode = 'ratio' | 'amount'
+export type DcaDateMode = 'start-duration' | 'end-recent'
 
 export interface PricePoint {
   date: string
@@ -78,12 +91,22 @@ export interface DataManifest {
   indices: IndexMeta[]
 }
 
+export interface DcaPortfolioLeg {
+  indexCode: IndexCode
+  ratio: number
+  amountCny: number
+}
+
 export interface DcaParams {
   kind: 'dca'
-  indexCode: IndexCode
+  portfolio: DcaPortfolioLeg[]
+  allocationMode: DcaAllocationMode
+  dateMode: DcaDateMode
   startDate: string
   endDate: string
-  amountCny: number
+  durationYears: number
+  recentYears: number
+  periodicTotalAmountCny: number
   frequency: Frequency
   feeRate: number
   feeFixed: number
@@ -168,10 +191,13 @@ export interface YearlyMetric {
 
 export interface ExecutedTrade {
   date: string
+  indexCode: IndexCode
   side: 'buy' | 'sell'
   units: number
   price: number
   fx?: number
+  grossAmountCny: number
+  netAmountCny: number
 }
 
 export interface BenchmarkCurvePoint {
@@ -206,6 +232,33 @@ export interface RiskMetrics {
   holdingDays: number
 }
 
+export interface AssetCurvePoint {
+  date: string
+  indexCode: IndexCode
+  investedCny: number
+  valueCny: number
+  units: number
+}
+
+export interface AssetSummary {
+  indexCode: IndexCode
+  investedCny: number
+  endingValueCny: number
+  returnRate: number
+  tradeCount: number
+}
+
+export interface ResolvedDateRange {
+  startDate: string
+  endDate: string
+  label: string
+}
+
+export interface BacktestDataset {
+  seriesByCode: Partial<Record<IndexCode, PricePoint[]>>
+  currencyByCode: Partial<Record<IndexCode, AssetCurrency>>
+}
+
 export interface BacktestResult {
   summary: BacktestSummary
   curve: BacktestCurvePoint[]
@@ -215,6 +268,9 @@ export interface BacktestResult {
   holdingMetrics: HoldingMetricPoint[]
   riskMetrics: RiskMetrics
   executedTrades: ExecutedTrade[]
+  assetCurves: AssetCurvePoint[]
+  assetSummaries: AssetSummary[]
+  resolvedRange: ResolvedDateRange
 }
 
 export interface SeriesBundle {

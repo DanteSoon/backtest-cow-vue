@@ -9,10 +9,20 @@ const STORAGE_KEY = 'backtest-cow-vue:recent-backtests'
 
 export const createDefaultDcaParams = (): DcaParams => ({
   kind: 'dca',
-  indexCode: DEFAULT_INDEX_CODE,
-  startDate: dayjs().subtract(10, 'year').format('YYYY-MM-DD'),
+  portfolio: [
+    {
+      indexCode: DEFAULT_INDEX_CODE,
+      ratio: 100,
+      amountCny: 2000,
+    },
+  ],
+  allocationMode: 'ratio',
+  dateMode: 'start-duration',
+  startDate: dayjs().subtract(10, 'year').startOf('month').format('YYYY-MM-DD'),
   endDate: dayjs().format('YYYY-MM-DD'),
-  amountCny: 2000,
+  durationYears: 10,
+  recentYears: 10,
+  periodicTotalAmountCny: 2000,
   frequency: 'monthly',
   feeRate: 0,
   feeFixed: 0,
@@ -44,6 +54,7 @@ export interface RecentBacktestRecord {
   createdAt: string
   params: BacktestParams
   summary: BacktestResult['summary']
+  label: string
 }
 
 const cloneParams = (params: BacktestParams): BacktestParams => JSON.parse(JSON.stringify(params))
@@ -73,12 +84,18 @@ export const useBacktestStore = defineStore('backtest', () => {
   }
 
   const saveRecent = (summary: BacktestResult['summary']) => {
+    const label =
+      params.value.kind === 'dca'
+        ? params.value.portfolio.map((item) => item.indexCode).join(' / ')
+        : params.value.indexCode
+
     recent.value = [
       {
         id: `${Date.now()}`,
         createdAt: new Date().toISOString(),
         params: cloneParams(params.value),
         summary,
+        label,
       },
       ...recent.value,
     ].slice(0, 5)

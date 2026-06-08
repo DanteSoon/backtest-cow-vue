@@ -68,9 +68,18 @@ export const createChartOptions = ({
   toolbox: {
     right: 0,
     feature: {
-      saveAsImage: {},
-      dataZoom: {},
-      restore: {},
+      saveAsImage: {
+        title: '保存为图片',
+      },
+      dataZoom: {
+        title: {
+          zoom: '区域缩放',
+          back: '缩放还原',
+        },
+      },
+      restore: {
+        title: '还原',
+      },
     },
   },
   grid: {

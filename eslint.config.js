@@ -16,6 +16,20 @@ export default [
   ...tseslint.configs.recommended,
   ...pluginVue.configs['flat/recommended'],
   {
+    files: ['scripts/**/*.mjs'],
+    languageOptions: {
+      ecmaVersion: 'latest',
+      sourceType: 'module',
+      globals: {
+        console: 'readonly',
+        fetch: 'readonly',
+        process: 'readonly',
+        setTimeout: 'readonly',
+        URL: 'readonly',
+      },
+    },
+  },
+  {
     files: ['**/*.{ts,tsx,vue}'],
     languageOptions: {
       parser: vueParser,

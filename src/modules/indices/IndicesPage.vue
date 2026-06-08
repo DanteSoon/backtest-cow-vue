@@ -1,10 +1,17 @@
 <script setup lang="ts">
 import { onMounted } from 'vue'
 import AppShell from '@/shared/components/AppShell.vue'
+import InfoTip from '@/shared/components/InfoTip.vue'
 import { useDataStore } from '@/shared/stores/data'
-import { formatDays, formatNumber } from '@/shared/utils/formatters'
+import { formatCurrencyLabel, formatDays, formatNumber, formatValidationStatus } from '@/shared/utils/formatters'
 
 const dataStore = useDataStore()
+
+const explainers = {
+  price: '最新点位为当前本地快照中的最近收盘价，用来快速观察指数大致所处位置。',
+  pointCount: '点数表示本地已保存的交易日数据条数，越多通常代表历史覆盖越长。',
+  staleDays: '滞后表示距离最近一个应更新交易日还差多少个工作日，越大说明数据越旧。',
+}
 
 onMounted(async () => {
   await dataStore.ensureManifest()
@@ -14,27 +21,63 @@ onMounted(async () => {
 <template>
   <AppShell>
     <section class="indices-grid">
-      <article v-for="index in dataStore.manifest?.indices ?? []" :key="index.code" class="index-card">
+      <article
+        v-for="index in dataStore.manifest?.indices ?? []"
+        :key="index.code"
+        class="index-card"
+      >
         <div class="index-card__top">
           <div>
-            <div class="index-card__title">{{ index.shortName }}</div>
-            <div class="index-card__desc">{{ index.description }}</div>
+            <div class="index-card__title">
+              {{ index.shortName }}
+            </div>
+            <div class="index-card__desc">
+              {{ index.description }}
+            </div>
           </div>
-          <div class="index-card__badge" :class="`is-${index.dataQuality.validationStatus}`">
-            {{ index.dataQuality.validationStatus }}
+          <div
+            class="index-card__badge"
+            :class="`is-${index.dataQuality.validationStatus}`"
+          >
+            {{ formatValidationStatus(index.dataQuality.validationStatus) }}
           </div>
         </div>
-        <div class="index-card__price">{{ formatNumber(index.latestClose) }}</div>
+        <div class="index-card__price">
+          {{ formatNumber(index.latestClose) }}
+          <InfoTip
+            title="最新点位"
+            :content="explainers.price"
+          />
+        </div>
         <div class="index-card__meta">
           <span>{{ index.startDate }} ~ {{ index.latestDate }}</span>
-          <span>{{ index.currency }}</span>
+          <span>{{ formatCurrencyLabel(index.currency) }}</span>
         </div>
         <div class="index-card__meta">
-          <span>点数 {{ formatNumber(index.pointCount, 0) }}</span>
-          <span>滞后 {{ formatDays(index.dataQuality.staleDays) }}</span>
+          <span class="index-card__inline-label">
+            点数 {{ formatNumber(index.pointCount, 0) }}
+            <InfoTip
+              title="点数"
+              :content="explainers.pointCount"
+            />
+          </span>
+          <span class="index-card__inline-label">
+            滞后 {{ formatDays(index.dataQuality.staleDays) }}
+            <InfoTip
+              title="滞后"
+              :content="explainers.staleDays"
+            />
+          </span>
         </div>
-        <div class="index-card__quality">{{ index.dataQuality.message }}</div>
-        <RouterLink class="index-card__link" :to="`/indices/${index.code}`">进入详情</RouterLink>
+        <div class="index-card__quality">
+          {{ index.dataQuality.message }}
+        </div>
+        <RouterLink
+          class="index-card__link"
+          :to="`/indices/${index.code}`"
+        >
+          进入详情
+        </RouterLink>
       </article>
     </section>
   </AppShell>
@@ -66,6 +109,13 @@ onMounted(async () => {
 .index-card__title {
   font-size: 20px;
   font-weight: 800;
+}
+
+.index-card__price,
+.index-card__inline-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
 }
 
 .index-card__desc,

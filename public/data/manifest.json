@@ -1,6 +1,6 @@
 {
-  "updatedAt": "2026-06-03T06:43:26.728Z",
-  "generatedAt": "2026-06-03T06:43:26.731Z",
+  "updatedAt": "2026-06-08T01:51:28.861Z",
+  "generatedAt": "2026-06-08T01:51:28.861Z",
   "indices": [
     {
       "code": "SPX",
@@ -12,15 +12,15 @@
       "sourceSymbol": "^GSPC",
       "tradingCalendar": "US",
       "startDate": "1970-01-02",
-      "endDate": "2026-06-02",
-      "pointCount": 14225,
-      "latestClose": 7609.7798,
-      "latestDate": "2026-06-02",
+      "endDate": "2026-06-05",
+      "pointCount": 14228,
+      "latestClose": 7383.7402,
+      "latestDate": "2026-06-05",
       "description": "美国大盘股基准指数，覆盖 500 家代表性上市公司。",
       "dataQuality": {
         "validationStatus": "warning",
         "staleDays": 1,
-        "pointCount": 14225,
+        "pointCount": 14228,
         "missingRangeCount": 0,
         "missingDateRanges": [],
         "confirmedClosures": [
@@ -53,15 +53,15 @@
       "sourceSymbol": "^NDX",
       "tradingCalendar": "US",
       "startDate": "1985-10-01",
-      "endDate": "2026-06-02",
-      "pointCount": 10246,
-      "latestClose": 30660.5996,
-      "latestDate": "2026-06-02",
+      "endDate": "2026-06-05",
+      "pointCount": 10249,
+      "latestClose": 28957.5996,
+      "latestDate": "2026-06-05",
       "description": "纳斯达克市场 100 家大型非金融公司构成的成长型指数。",
       "dataQuality": {
         "validationStatus": "warning",
         "staleDays": 1,
-        "pointCount": 10246,
+        "pointCount": 10249,
         "missingRangeCount": 0,
         "missingDateRanges": [],
         "confirmedClosures": [
@@ -94,15 +94,15 @@
       "sourceSymbol": "^DJI",
       "tradingCalendar": "US",
       "startDate": "1992-01-02",
-      "endDate": "2026-06-02",
-      "pointCount": 8665,
-      "latestClose": 51307.7891,
-      "latestDate": "2026-06-02",
+      "endDate": "2026-06-05",
+      "pointCount": 8668,
+      "latestClose": 50866.7813,
+      "latestDate": "2026-06-05",
       "description": "美国历史最久的价格加权指数之一，反映传统蓝筹股表现。",
       "dataQuality": {
         "validationStatus": "warning",
         "staleDays": 1,
-        "pointCount": 8665,
+        "pointCount": 8668,
         "missingRangeCount": 0,
         "missingDateRanges": [],
         "confirmedClosures": [
@@ -135,15 +135,15 @@
       "sourceSymbol": "^RUT",
       "tradingCalendar": "US",
       "startDate": "1987-09-10",
-      "endDate": "2026-06-02",
-      "pointCount": 9755,
-      "latestClose": 2931.96,
-      "latestDate": "2026-06-02",
+      "endDate": "2026-06-05",
+      "pointCount": 9758,
+      "latestClose": 2833.5,
+      "latestDate": "2026-06-05",
       "description": "美国中小盘股代表指数，更能体现风险偏好变化。",
       "dataQuality": {
         "validationStatus": "warning",
         "staleDays": 1,
-        "pointCount": 9755,
+        "pointCount": 9758,
         "missingRangeCount": 0,
         "missingDateRanges": [],
         "confirmedClosures": [
@@ -176,15 +176,15 @@
       "sourceSymbol": "1.000300",
       "tradingCalendar": "CN",
       "startDate": "2005-01-04",
-      "endDate": "2026-06-03",
-      "pointCount": 5199,
-      "latestClose": 4933.49,
-      "latestDate": "2026-06-03",
+      "endDate": "2026-06-08",
+      "pointCount": 5202,
+      "latestClose": 4751.48,
+      "latestDate": "2026-06-08",
       "description": "沪深两市 300 只大市值股票组成的核心宽基指数。",
       "dataQuality": {
         "validationStatus": "warning",
         "staleDays": 0,
-        "pointCount": 5199,
+        "pointCount": 5202,
         "missingRangeCount": 0,
         "missingDateRanges": [],
         "confirmedClosures": [
@@ -487,15 +487,15 @@
       "sourceSymbol": "1.000905",
       "tradingCalendar": "CN",
       "startDate": "2005-01-04",
-      "endDate": "2026-06-03",
-      "pointCount": 5199,
-      "latestClose": 8342.22,
-      "latestDate": "2026-06-03",
+      "endDate": "2026-06-08",
+      "pointCount": 5202,
+      "latestClose": 8095.08,
+      "latestDate": "2026-06-08",
       "description": "A 股中盘风格核心指数，兼顾成长与周期属性。",
       "dataQuality": {
         "validationStatus": "warning",
         "staleDays": 0,
-        "pointCount": 5199,
+        "pointCount": 5202,
         "missingRangeCount": 0,
         "missingDateRanges": [],
         "confirmedClosures": [
@@ -786,6 +786,1435 @@
         "issueCount": 1,
         "hasSuspiciousGaps": false,
         "message": "确认 46 段停市区间"
+      }
+    },
+    {
+      "code": "SHCOMP",
+      "name": "上证指数",
+      "shortName": "上证指数",
+      "market": "CN",
+      "currency": "CNY",
+      "source": "eastmoney",
+      "sourceSymbol": "1.000001",
+      "tradingCalendar": "CN",
+      "startDate": "1990-12-19",
+      "endDate": "2026-06-08",
+      "pointCount": 8656,
+      "latestClose": 3983.19,
+      "latestDate": "2026-06-08",
+      "description": "上海证券交易所最具代表性的宽基指数之一，反映沪市整体表现。",
+      "dataQuality": {
+        "validationStatus": "warning",
+        "staleDays": 0,
+        "pointCount": 8656,
+        "missingRangeCount": 0,
+        "missingDateRanges": [],
+        "confirmedClosures": [
+          {
+            "startDate": "1994-02-07",
+            "endDate": "1994-02-11",
+            "reason": "spring festival",
+            "missingDays": 5
+          },
+          {
+            "startDate": "1995-01-30",
+            "endDate": "1995-02-10",
+            "reason": "spring festival",
+            "missingDays": 5
+          },
+          {
+            "startDate": "1996-02-19",
+            "endDate": "1996-03-01",
+            "reason": "spring festival",
+            "missingDays": 10
+          },
+          {
+            "startDate": "1997-02-03",
+            "endDate": "1997-02-14",
+            "reason": "spring festival",
+            "missingDays": 10
+          },
+          {
+            "startDate": "1998-01-26",
+            "endDate": "1998-02-06",
+            "reason": "spring festival",
+            "missingDays": 10
+          },
+          {
+            "startDate": "1999-02-10",
+            "endDate": "1999-02-26",
+            "reason": "spring festival",
+            "missingDays": 13
+          },
+          {
+            "startDate": "1999-10-01",
+            "endDate": "1999-10-07",
+            "reason": "national day",
+            "missingDays": 5
+          },
+          {
+            "startDate": "2000-01-31",
+            "endDate": "2000-02-11",
+            "reason": "spring festival",
+            "missingDays": 10
+          },
+          {
+            "startDate": "2000-05-01",
+            "endDate": "2000-05-05",
+            "reason": "labor day",
+            "missingDays": 5
+          },
+          {
+            "startDate": "2000-10-02",
+            "endDate": "2000-10-06",
+            "reason": "national day",
+            "missingDays": 5
+          },
+          {
+            "startDate": "2001-01-22",
+            "endDate": "2001-02-02",
+            "reason": "spring festival",
+            "missingDays": 10
+          },
+          {
+            "startDate": "2001-05-01",
+            "endDate": "2001-05-07",
+            "reason": "labor day",
+            "missingDays": 5
+          },
+          {
+            "startDate": "2001-10-01",
+            "endDate": "2001-10-05",
+            "reason": "national day",
+            "missingDays": 5
+          },
+          {
+            "startDate": "2002-02-11",
+            "endDate": "2002-02-22",
+            "reason": "spring festival",
+            "missingDays": 10
+          },
+          {
+            "startDate": "2002-05-01",
+            "endDate": "2002-05-07",
+            "reason": "labor day",
+            "missingDays": 5
+          },
+          {
+            "startDate": "2002-09-30",
+            "endDate": "2002-10-07",
+            "reason": "national day",
+            "missingDays": 6
+          },
+          {
+            "startDate": "2003-01-30",
+            "endDate": "2003-02-07",
+            "reason": "spring festival",
+            "missingDays": 7
+          },
+          {
+            "startDate": "2003-05-01",
+            "endDate": "2003-05-09",
+            "reason": "labor day",
+            "missingDays": 7
+          },
+          {
+            "startDate": "2003-10-01",
+            "endDate": "2003-10-07",
+            "reason": "national day",
+            "missingDays": 5
+          },
+          {
+            "startDate": "2004-01-19",
+            "endDate": "2004-01-28",
+            "reason": "spring festival",
+            "missingDays": 8
+          },
+          {
+            "startDate": "2004-05-03",
+            "endDate": "2004-05-07",
+            "reason": "labor day",
+            "missingDays": 5
+          },
+          {
+            "startDate": "2004-10-01",
+            "endDate": "2004-10-07",
+            "reason": "national day",
+            "missingDays": 5
+          },
+          {
+            "startDate": "2005-02-07",
+            "endDate": "2005-02-15",
+            "reason": "spring festival",
+            "missingDays": 7
+          },
+          {
+            "startDate": "2005-05-02",
+            "endDate": "2005-05-06",
+            "reason": "labor day",
+            "missingDays": 5
+          },
+          {
+            "startDate": "2005-10-03",
+            "endDate": "2005-10-07",
+            "reason": "national day",
+            "missingDays": 5
+          },
+          {
+            "startDate": "2006-01-26",
+            "endDate": "2006-02-03",
+            "reason": "spring festival",
+            "missingDays": 7
+          },
+          {
+            "startDate": "2006-05-01",
+            "endDate": "2006-05-05",
+            "reason": "labor day",
+            "missingDays": 5
+          },
+          {
+            "startDate": "2006-10-02",
+            "endDate": "2006-10-06",
+            "reason": "national day",
+            "missingDays": 5
+          },
+          {
+            "startDate": "2007-02-19",
+            "endDate": "2007-02-23",
+            "reason": "spring festival",
+            "missingDays": 5
+          },
+          {
+            "startDate": "2007-05-01",
+            "endDate": "2007-05-07",
+            "reason": "labor day",
+            "missingDays": 5
+          },
+          {
+            "startDate": "2007-10-01",
+            "endDate": "2007-10-05",
+            "reason": "national day",
+            "missingDays": 5
+          },
+          {
+            "startDate": "2008-02-06",
+            "endDate": "2008-02-12",
+            "reason": "spring festival",
+            "missingDays": 5
+          },
+          {
+            "startDate": "2008-09-29",
+            "endDate": "2008-10-03",
+            "reason": "national day",
+            "missingDays": 5
+          },
+          {
+            "startDate": "2009-01-26",
+            "endDate": "2009-01-30",
+            "reason": "spring festival",
+            "missingDays": 5
+          },
+          {
+            "startDate": "2009-10-01",
+            "endDate": "2009-10-08",
+            "reason": "national day",
+            "missingDays": 6
+          },
+          {
+            "startDate": "2010-02-15",
+            "endDate": "2010-02-19",
+            "reason": "spring festival",
+            "missingDays": 5
+          },
+          {
+            "startDate": "2010-10-01",
+            "endDate": "2010-10-07",
+            "reason": "national day",
+            "missingDays": 5
+          },
+          {
+            "startDate": "2011-02-02",
+            "endDate": "2011-02-08",
+            "reason": "spring festival",
+            "missingDays": 5
+          },
+          {
+            "startDate": "2011-10-03",
+            "endDate": "2011-10-07",
+            "reason": "national day",
+            "missingDays": 5
+          },
+          {
+            "startDate": "2012-01-23",
+            "endDate": "2012-01-27",
+            "reason": "spring festival",
+            "missingDays": 5
+          },
+          {
+            "startDate": "2012-10-01",
+            "endDate": "2012-10-05",
+            "reason": "national day",
+            "missingDays": 5
+          },
+          {
+            "startDate": "2013-02-11",
+            "endDate": "2013-02-15",
+            "reason": "spring festival",
+            "missingDays": 5
+          },
+          {
+            "startDate": "2013-10-01",
+            "endDate": "2013-10-07",
+            "reason": "national day",
+            "missingDays": 5
+          },
+          {
+            "startDate": "2014-01-31",
+            "endDate": "2014-02-06",
+            "reason": "spring festival",
+            "missingDays": 5
+          },
+          {
+            "startDate": "2014-10-01",
+            "endDate": "2014-10-07",
+            "reason": "national day",
+            "missingDays": 5
+          },
+          {
+            "startDate": "2015-02-18",
+            "endDate": "2015-02-24",
+            "reason": "spring festival",
+            "missingDays": 5
+          },
+          {
+            "startDate": "2015-10-01",
+            "endDate": "2015-10-07",
+            "reason": "national day",
+            "missingDays": 5
+          },
+          {
+            "startDate": "2016-02-08",
+            "endDate": "2016-02-12",
+            "reason": "spring festival",
+            "missingDays": 5
+          },
+          {
+            "startDate": "2016-10-03",
+            "endDate": "2016-10-07",
+            "reason": "national day",
+            "missingDays": 5
+          },
+          {
+            "startDate": "2017-01-27",
+            "endDate": "2017-02-02",
+            "reason": "spring festival",
+            "missingDays": 5
+          },
+          {
+            "startDate": "2017-10-02",
+            "endDate": "2017-10-06",
+            "reason": "national day",
+            "missingDays": 5
+          },
+          {
+            "startDate": "2018-02-15",
+            "endDate": "2018-02-21",
+            "reason": "spring festival",
+            "missingDays": 5
+          },
+          {
+            "startDate": "2018-10-01",
+            "endDate": "2018-10-05",
+            "reason": "national day",
+            "missingDays": 5
+          },
+          {
+            "startDate": "2019-02-04",
+            "endDate": "2019-02-08",
+            "reason": "spring festival",
+            "missingDays": 5
+          },
+          {
+            "startDate": "2019-10-01",
+            "endDate": "2019-10-07",
+            "reason": "national day",
+            "missingDays": 5
+          },
+          {
+            "startDate": "2020-01-24",
+            "endDate": "2020-01-31",
+            "reason": "spring festival",
+            "missingDays": 6
+          },
+          {
+            "startDate": "2020-10-01",
+            "endDate": "2020-10-08",
+            "reason": "national day",
+            "missingDays": 6
+          },
+          {
+            "startDate": "2021-02-11",
+            "endDate": "2021-02-17",
+            "reason": "spring festival",
+            "missingDays": 5
+          },
+          {
+            "startDate": "2021-10-01",
+            "endDate": "2021-10-07",
+            "reason": "national day",
+            "missingDays": 5
+          },
+          {
+            "startDate": "2022-01-31",
+            "endDate": "2022-02-04",
+            "reason": "spring festival",
+            "missingDays": 5
+          },
+          {
+            "startDate": "2022-10-03",
+            "endDate": "2022-10-07",
+            "reason": "national day",
+            "missingDays": 5
+          },
+          {
+            "startDate": "2023-01-23",
+            "endDate": "2023-01-27",
+            "reason": "spring festival",
+            "missingDays": 5
+          },
+          {
+            "startDate": "2023-09-29",
+            "endDate": "2023-10-06",
+            "reason": "national day",
+            "missingDays": 6
+          },
+          {
+            "startDate": "2024-02-09",
+            "endDate": "2024-02-16",
+            "reason": "spring festival",
+            "missingDays": 6
+          },
+          {
+            "startDate": "2024-10-01",
+            "endDate": "2024-10-07",
+            "reason": "national day",
+            "missingDays": 5
+          },
+          {
+            "startDate": "2025-01-28",
+            "endDate": "2025-02-04",
+            "reason": "spring festival",
+            "missingDays": 6
+          },
+          {
+            "startDate": "2025-10-01",
+            "endDate": "2025-10-08",
+            "reason": "national day",
+            "missingDays": 6
+          },
+          {
+            "startDate": "2026-02-16",
+            "endDate": "2026-02-23",
+            "reason": "spring festival",
+            "missingDays": 6
+          }
+        ],
+        "fieldCoverage": {
+          "open": 1,
+          "high": 1,
+          "low": 1,
+          "close": 1,
+          "volume": 1
+        },
+        "issueCount": 1,
+        "hasSuspiciousGaps": false,
+        "message": "确认 68 段停市区间"
+      }
+    },
+    {
+      "code": "SZCOMP",
+      "name": "深证成指",
+      "shortName": "深证成指",
+      "market": "CN",
+      "currency": "CNY",
+      "source": "eastmoney",
+      "sourceSymbol": "0.399001",
+      "tradingCalendar": "CN",
+      "startDate": "1991-04-03",
+      "endDate": "2026-06-08",
+      "pointCount": 8609,
+      "latestClose": 15048.12,
+      "latestDate": "2026-06-08",
+      "description": "深圳市场核心成份指数，兼具成长与制造业权重特征。",
+      "dataQuality": {
+        "validationStatus": "warning",
+        "staleDays": 0,
+        "pointCount": 8609,
+        "missingRangeCount": 0,
+        "missingDateRanges": [],
+        "confirmedClosures": [
+          {
+            "startDate": "1992-02-03",
+            "endDate": "1992-02-07",
+            "reason": "spring festival",
+            "missingDays": 5
+          },
+          {
+            "startDate": "1993-01-20",
+            "endDate": "1993-01-29",
+            "reason": "spring festival",
+            "missingDays": 8
+          },
+          {
+            "startDate": "1994-02-07",
+            "endDate": "1994-02-11",
+            "reason": "spring festival",
+            "missingDays": 5
+          },
+          {
+            "startDate": "1995-01-30",
+            "endDate": "1995-02-10",
+            "reason": "spring festival",
+            "missingDays": 10
+          },
+          {
+            "startDate": "1996-02-19",
+            "endDate": "1996-03-01",
+            "reason": "spring festival",
+            "missingDays": 10
+          },
+          {
+            "startDate": "1997-02-03",
+            "endDate": "1997-02-14",
+            "reason": "spring festival",
+            "missingDays": 10
+          },
+          {
+            "startDate": "1998-01-26",
+            "endDate": "1998-02-06",
+            "reason": "spring festival",
+            "missingDays": 10
+          },
+          {
+            "startDate": "1999-02-10",
+            "endDate": "1999-02-26",
+            "reason": "spring festival",
+            "missingDays": 13
+          },
+          {
+            "startDate": "1999-10-01",
+            "endDate": "1999-10-07",
+            "reason": "national day",
+            "missingDays": 5
+          },
+          {
+            "startDate": "2000-01-31",
+            "endDate": "2000-02-11",
+            "reason": "spring festival",
+            "missingDays": 10
+          },
+          {
+            "startDate": "2000-05-01",
+            "endDate": "2000-05-05",
+            "reason": "labor day",
+            "missingDays": 5
+          },
+          {
+            "startDate": "2000-10-02",
+            "endDate": "2000-10-06",
+            "reason": "national day",
+            "missingDays": 5
+          },
+          {
+            "startDate": "2001-01-22",
+            "endDate": "2001-02-02",
+            "reason": "spring festival",
+            "missingDays": 10
+          },
+          {
+            "startDate": "2001-05-01",
+            "endDate": "2001-05-07",
+            "reason": "labor day",
+            "missingDays": 5
+          },
+          {
+            "startDate": "2001-10-01",
+            "endDate": "2001-10-05",
+            "reason": "national day",
+            "missingDays": 5
+          },
+          {
+            "startDate": "2002-02-11",
+            "endDate": "2002-02-22",
+            "reason": "spring festival",
+            "missingDays": 10
+          },
+          {
+            "startDate": "2002-05-01",
+            "endDate": "2002-05-07",
+            "reason": "labor day",
+            "missingDays": 5
+          },
+          {
+            "startDate": "2002-09-30",
+            "endDate": "2002-10-07",
+            "reason": "national day",
+            "missingDays": 6
+          },
+          {
+            "startDate": "2003-01-30",
+            "endDate": "2003-02-07",
+            "reason": "spring festival",
+            "missingDays": 7
+          },
+          {
+            "startDate": "2003-05-01",
+            "endDate": "2003-05-09",
+            "reason": "labor day",
+            "missingDays": 7
+          },
+          {
+            "startDate": "2003-10-01",
+            "endDate": "2003-10-07",
+            "reason": "national day",
+            "missingDays": 5
+          },
+          {
+            "startDate": "2004-01-19",
+            "endDate": "2004-01-28",
+            "reason": "spring festival",
+            "missingDays": 8
+          },
+          {
+            "startDate": "2004-05-03",
+            "endDate": "2004-05-07",
+            "reason": "labor day",
+            "missingDays": 5
+          },
+          {
+            "startDate": "2004-10-01",
+            "endDate": "2004-10-07",
+            "reason": "national day",
+            "missingDays": 5
+          },
+          {
+            "startDate": "2005-02-07",
+            "endDate": "2005-02-15",
+            "reason": "spring festival",
+            "missingDays": 7
+          },
+          {
+            "startDate": "2005-05-02",
+            "endDate": "2005-05-06",
+            "reason": "labor day",
+            "missingDays": 5
+          },
+          {
+            "startDate": "2005-10-03",
+            "endDate": "2005-10-07",
+            "reason": "national day",
+            "missingDays": 5
+          },
+          {
+            "startDate": "2006-01-26",
+            "endDate": "2006-02-03",
+            "reason": "spring festival",
+            "missingDays": 7
+          },
+          {
+            "startDate": "2006-05-01",
+            "endDate": "2006-05-05",
+            "reason": "labor day",
+            "missingDays": 5
+          },
+          {
+            "startDate": "2006-10-02",
+            "endDate": "2006-10-06",
+            "reason": "national day",
+            "missingDays": 5
+          },
+          {
+            "startDate": "2007-02-19",
+            "endDate": "2007-02-23",
+            "reason": "spring festival",
+            "missingDays": 5
+          },
+          {
+            "startDate": "2007-05-01",
+            "endDate": "2007-05-07",
+            "reason": "labor day",
+            "missingDays": 5
+          },
+          {
+            "startDate": "2007-10-01",
+            "endDate": "2007-10-05",
+            "reason": "national day",
+            "missingDays": 5
+          },
+          {
+            "startDate": "2008-02-06",
+            "endDate": "2008-02-12",
+            "reason": "spring festival",
+            "missingDays": 5
+          },
+          {
+            "startDate": "2008-09-29",
+            "endDate": "2008-10-03",
+            "reason": "national day",
+            "missingDays": 5
+          },
+          {
+            "startDate": "2009-01-26",
+            "endDate": "2009-01-30",
+            "reason": "spring festival",
+            "missingDays": 5
+          },
+          {
+            "startDate": "2009-10-01",
+            "endDate": "2009-10-08",
+            "reason": "national day",
+            "missingDays": 6
+          },
+          {
+            "startDate": "2010-02-15",
+            "endDate": "2010-02-19",
+            "reason": "spring festival",
+            "missingDays": 5
+          },
+          {
+            "startDate": "2010-10-01",
+            "endDate": "2010-10-07",
+            "reason": "national day",
+            "missingDays": 5
+          },
+          {
+            "startDate": "2011-02-02",
+            "endDate": "2011-02-08",
+            "reason": "spring festival",
+            "missingDays": 5
+          },
+          {
+            "startDate": "2011-10-03",
+            "endDate": "2011-10-07",
+            "reason": "national day",
+            "missingDays": 5
+          },
+          {
+            "startDate": "2012-01-23",
+            "endDate": "2012-01-27",
+            "reason": "spring festival",
+            "missingDays": 5
+          },
+          {
+            "startDate": "2012-10-01",
+            "endDate": "2012-10-05",
+            "reason": "national day",
+            "missingDays": 5
+          },
+          {
+            "startDate": "2013-02-11",
+            "endDate": "2013-02-15",
+            "reason": "spring festival",
+            "missingDays": 5
+          },
+          {
+            "startDate": "2013-10-01",
+            "endDate": "2013-10-07",
+            "reason": "national day",
+            "missingDays": 5
+          },
+          {
+            "startDate": "2014-01-31",
+            "endDate": "2014-02-06",
+            "reason": "spring festival",
+            "missingDays": 5
+          },
+          {
+            "startDate": "2014-10-01",
+            "endDate": "2014-10-07",
+            "reason": "national day",
+            "missingDays": 5
+          },
+          {
+            "startDate": "2015-02-18",
+            "endDate": "2015-02-24",
+            "reason": "spring festival",
+            "missingDays": 5
+          },
+          {
+            "startDate": "2015-10-01",
+            "endDate": "2015-10-07",
+            "reason": "national day",
+            "missingDays": 5
+          },
+          {
+            "startDate": "2016-02-08",
+            "endDate": "2016-02-12",
+            "reason": "spring festival",
+            "missingDays": 5
+          },
+          {
+            "startDate": "2016-10-03",
+            "endDate": "2016-10-07",
+            "reason": "national day",
+            "missingDays": 5
+          },
+          {
+            "startDate": "2017-01-27",
+            "endDate": "2017-02-02",
+            "reason": "spring festival",
+            "missingDays": 5
+          },
+          {
+            "startDate": "2017-10-02",
+            "endDate": "2017-10-06",
+            "reason": "national day",
+            "missingDays": 5
+          },
+          {
+            "startDate": "2018-02-15",
+            "endDate": "2018-02-21",
+            "reason": "spring festival",
+            "missingDays": 5
+          },
+          {
+            "startDate": "2018-10-01",
+            "endDate": "2018-10-05",
+            "reason": "national day",
+            "missingDays": 5
+          },
+          {
+            "startDate": "2019-02-04",
+            "endDate": "2019-02-08",
+            "reason": "spring festival",
+            "missingDays": 5
+          },
+          {
+            "startDate": "2019-10-01",
+            "endDate": "2019-10-07",
+            "reason": "national day",
+            "missingDays": 5
+          },
+          {
+            "startDate": "2020-01-24",
+            "endDate": "2020-01-31",
+            "reason": "spring festival",
+            "missingDays": 6
+          },
+          {
+            "startDate": "2020-10-01",
+            "endDate": "2020-10-08",
+            "reason": "national day",
+            "missingDays": 6
+          },
+          {
+            "startDate": "2021-02-11",
+            "endDate": "2021-02-17",
+            "reason": "spring festival",
+            "missingDays": 5
+          },
+          {
+            "startDate": "2021-10-01",
+            "endDate": "2021-10-07",
+            "reason": "national day",
+            "missingDays": 5
+          },
+          {
+            "startDate": "2022-01-31",
+            "endDate": "2022-02-04",
+            "reason": "spring festival",
+            "missingDays": 5
+          },
+          {
+            "startDate": "2022-10-03",
+            "endDate": "2022-10-07",
+            "reason": "national day",
+            "missingDays": 5
+          },
+          {
+            "startDate": "2023-01-23",
+            "endDate": "2023-01-27",
+            "reason": "spring festival",
+            "missingDays": 5
+          },
+          {
+            "startDate": "2023-09-29",
+            "endDate": "2023-10-06",
+            "reason": "national day",
+            "missingDays": 6
+          },
+          {
+            "startDate": "2024-02-09",
+            "endDate": "2024-02-16",
+            "reason": "spring festival",
+            "missingDays": 6
+          },
+          {
+            "startDate": "2024-10-01",
+            "endDate": "2024-10-07",
+            "reason": "national day",
+            "missingDays": 5
+          },
+          {
+            "startDate": "2025-01-28",
+            "endDate": "2025-02-04",
+            "reason": "spring festival",
+            "missingDays": 6
+          },
+          {
+            "startDate": "2025-10-01",
+            "endDate": "2025-10-08",
+            "reason": "national day",
+            "missingDays": 6
+          },
+          {
+            "startDate": "2026-02-16",
+            "endDate": "2026-02-23",
+            "reason": "spring festival",
+            "missingDays": 6
+          }
+        ],
+        "fieldCoverage": {
+          "open": 1,
+          "high": 1,
+          "low": 1,
+          "close": 1,
+          "volume": 1
+        },
+        "issueCount": 1,
+        "hasSuspiciousGaps": false,
+        "message": "确认 70 段停市区间"
+      }
+    },
+    {
+      "code": "CHINEXT",
+      "name": "创业板指",
+      "shortName": "创业板指",
+      "market": "CN",
+      "currency": "CNY",
+      "source": "eastmoney",
+      "sourceSymbol": "0.399006",
+      "tradingCalendar": "CN",
+      "startDate": "2010-06-01",
+      "endDate": "2026-06-08",
+      "pointCount": 3888,
+      "latestClose": 3879.61,
+      "latestDate": "2026-06-08",
+      "description": "创业板核心指数，风格偏成长，波动和景气弹性通常更高。",
+      "dataQuality": {
+        "validationStatus": "warning",
+        "staleDays": 0,
+        "pointCount": 3888,
+        "missingRangeCount": 0,
+        "missingDateRanges": [],
+        "confirmedClosures": [
+          {
+            "startDate": "2010-10-01",
+            "endDate": "2010-10-07",
+            "reason": "national day",
+            "missingDays": 5
+          },
+          {
+            "startDate": "2011-02-02",
+            "endDate": "2011-02-08",
+            "reason": "spring festival",
+            "missingDays": 5
+          },
+          {
+            "startDate": "2011-10-03",
+            "endDate": "2011-10-07",
+            "reason": "national day",
+            "missingDays": 5
+          },
+          {
+            "startDate": "2012-01-23",
+            "endDate": "2012-01-27",
+            "reason": "spring festival",
+            "missingDays": 5
+          },
+          {
+            "startDate": "2012-10-01",
+            "endDate": "2012-10-05",
+            "reason": "national day",
+            "missingDays": 5
+          },
+          {
+            "startDate": "2013-02-11",
+            "endDate": "2013-02-15",
+            "reason": "spring festival",
+            "missingDays": 5
+          },
+          {
+            "startDate": "2013-10-01",
+            "endDate": "2013-10-07",
+            "reason": "national day",
+            "missingDays": 5
+          },
+          {
+            "startDate": "2014-01-31",
+            "endDate": "2014-02-06",
+            "reason": "spring festival",
+            "missingDays": 5
+          },
+          {
+            "startDate": "2014-10-01",
+            "endDate": "2014-10-07",
+            "reason": "national day",
+            "missingDays": 5
+          },
+          {
+            "startDate": "2015-02-18",
+            "endDate": "2015-02-24",
+            "reason": "spring festival",
+            "missingDays": 5
+          },
+          {
+            "startDate": "2015-10-01",
+            "endDate": "2015-10-07",
+            "reason": "national day",
+            "missingDays": 5
+          },
+          {
+            "startDate": "2016-02-08",
+            "endDate": "2016-02-12",
+            "reason": "spring festival",
+            "missingDays": 5
+          },
+          {
+            "startDate": "2016-10-03",
+            "endDate": "2016-10-07",
+            "reason": "national day",
+            "missingDays": 5
+          },
+          {
+            "startDate": "2017-01-27",
+            "endDate": "2017-02-02",
+            "reason": "spring festival",
+            "missingDays": 5
+          },
+          {
+            "startDate": "2017-10-02",
+            "endDate": "2017-10-06",
+            "reason": "national day",
+            "missingDays": 5
+          },
+          {
+            "startDate": "2018-02-15",
+            "endDate": "2018-02-21",
+            "reason": "spring festival",
+            "missingDays": 5
+          },
+          {
+            "startDate": "2018-10-01",
+            "endDate": "2018-10-05",
+            "reason": "national day",
+            "missingDays": 5
+          },
+          {
+            "startDate": "2019-02-04",
+            "endDate": "2019-02-08",
+            "reason": "spring festival",
+            "missingDays": 5
+          },
+          {
+            "startDate": "2019-10-01",
+            "endDate": "2019-10-07",
+            "reason": "national day",
+            "missingDays": 5
+          },
+          {
+            "startDate": "2020-01-24",
+            "endDate": "2020-01-31",
+            "reason": "spring festival",
+            "missingDays": 6
+          },
+          {
+            "startDate": "2020-10-01",
+            "endDate": "2020-10-08",
+            "reason": "national day",
+            "missingDays": 6
+          },
+          {
+            "startDate": "2021-02-11",
+            "endDate": "2021-02-17",
+            "reason": "spring festival",
+            "missingDays": 5
+          },
+          {
+            "startDate": "2021-10-01",
+            "endDate": "2021-10-07",
+            "reason": "national day",
+            "missingDays": 5
+          },
+          {
+            "startDate": "2022-01-31",
+            "endDate": "2022-02-04",
+            "reason": "spring festival",
+            "missingDays": 5
+          },
+          {
+            "startDate": "2022-10-03",
+            "endDate": "2022-10-07",
+            "reason": "national day",
+            "missingDays": 5
+          },
+          {
+            "startDate": "2023-01-23",
+            "endDate": "2023-01-27",
+            "reason": "spring festival",
+            "missingDays": 5
+          },
+          {
+            "startDate": "2023-09-29",
+            "endDate": "2023-10-06",
+            "reason": "national day",
+            "missingDays": 6
+          },
+          {
+            "startDate": "2024-02-09",
+            "endDate": "2024-02-16",
+            "reason": "spring festival",
+            "missingDays": 6
+          },
+          {
+            "startDate": "2024-10-01",
+            "endDate": "2024-10-07",
+            "reason": "national day",
+            "missingDays": 5
+          },
+          {
+            "startDate": "2025-01-28",
+            "endDate": "2025-02-04",
+            "reason": "spring festival",
+            "missingDays": 6
+          },
+          {
+            "startDate": "2025-10-01",
+            "endDate": "2025-10-08",
+            "reason": "national day",
+            "missingDays": 6
+          },
+          {
+            "startDate": "2026-02-16",
+            "endDate": "2026-02-23",
+            "reason": "spring festival",
+            "missingDays": 6
+          }
+        ],
+        "fieldCoverage": {
+          "open": 1,
+          "high": 1,
+          "low": 1,
+          "close": 1,
+          "volume": 1
+        },
+        "issueCount": 1,
+        "hasSuspiciousGaps": false,
+        "message": "确认 32 段停市区间"
+      }
+    },
+    {
+      "code": "STAR50",
+      "name": "科创50指数",
+      "shortName": "科创50",
+      "market": "CN",
+      "currency": "CNY",
+      "source": "eastmoney",
+      "sourceSymbol": "1.000688",
+      "tradingCalendar": "CN",
+      "startDate": "2019-12-31",
+      "endDate": "2026-06-08",
+      "pointCount": 1557,
+      "latestClose": 1626.75,
+      "latestDate": "2026-06-08",
+      "description": "科创板代表性指数，聚焦硬科技龙头与高研发企业。",
+      "dataQuality": {
+        "validationStatus": "warning",
+        "staleDays": 0,
+        "pointCount": 1557,
+        "missingRangeCount": 0,
+        "missingDateRanges": [],
+        "confirmedClosures": [
+          {
+            "startDate": "2020-01-24",
+            "endDate": "2020-01-31",
+            "reason": "spring festival",
+            "missingDays": 6
+          },
+          {
+            "startDate": "2020-10-01",
+            "endDate": "2020-10-08",
+            "reason": "national day",
+            "missingDays": 6
+          },
+          {
+            "startDate": "2021-02-11",
+            "endDate": "2021-02-17",
+            "reason": "spring festival",
+            "missingDays": 5
+          },
+          {
+            "startDate": "2021-10-01",
+            "endDate": "2021-10-07",
+            "reason": "national day",
+            "missingDays": 5
+          },
+          {
+            "startDate": "2022-01-31",
+            "endDate": "2022-02-04",
+            "reason": "spring festival",
+            "missingDays": 5
+          },
+          {
+            "startDate": "2022-10-03",
+            "endDate": "2022-10-07",
+            "reason": "national day",
+            "missingDays": 5
+          },
+          {
+            "startDate": "2023-01-23",
+            "endDate": "2023-01-27",
+            "reason": "spring festival",
+            "missingDays": 5
+          },
+          {
+            "startDate": "2023-09-29",
+            "endDate": "2023-10-06",
+            "reason": "national day",
+            "missingDays": 6
+          },
+          {
+            "startDate": "2024-02-09",
+            "endDate": "2024-02-16",
+            "reason": "spring festival",
+            "missingDays": 6
+          },
+          {
+            "startDate": "2024-10-01",
+            "endDate": "2024-10-07",
+            "reason": "national day",
+            "missingDays": 5
+          },
+          {
+            "startDate": "2025-01-28",
+            "endDate": "2025-02-04",
+            "reason": "spring festival",
+            "missingDays": 6
+          },
+          {
+            "startDate": "2025-10-01",
+            "endDate": "2025-10-08",
+            "reason": "national day",
+            "missingDays": 6
+          },
+          {
+            "startDate": "2026-02-16",
+            "endDate": "2026-02-23",
+            "reason": "spring festival",
+            "missingDays": 6
+          }
+        ],
+        "fieldCoverage": {
+          "open": 1,
+          "high": 1,
+          "low": 1,
+          "close": 1,
+          "volume": 1
+        },
+        "issueCount": 1,
+        "hasSuspiciousGaps": false,
+        "message": "确认 13 段停市区间"
+      }
+    },
+    {
+      "code": "GOLD_ETF",
+      "name": "华安黄金ETF",
+      "shortName": "黄金ETF",
+      "market": "CN",
+      "currency": "CNY",
+      "source": "eastmoney",
+      "sourceSymbol": "1.518880",
+      "tradingCalendar": "CN",
+      "startDate": "2013-07-29",
+      "endDate": "2026-06-08",
+      "pointCount": 3125,
+      "latestClose": 9.007,
+      "latestDate": "2026-06-08",
+      "description": "国内成交活跃的黄金 ETF，可作为人民币计价黄金资产代理。",
+      "dataQuality": {
+        "validationStatus": "warning",
+        "staleDays": 0,
+        "pointCount": 3125,
+        "missingRangeCount": 0,
+        "missingDateRanges": [],
+        "confirmedClosures": [
+          {
+            "startDate": "2013-10-01",
+            "endDate": "2013-10-07",
+            "reason": "national day",
+            "missingDays": 5
+          },
+          {
+            "startDate": "2014-01-31",
+            "endDate": "2014-02-06",
+            "reason": "spring festival",
+            "missingDays": 5
+          },
+          {
+            "startDate": "2014-10-01",
+            "endDate": "2014-10-07",
+            "reason": "national day",
+            "missingDays": 5
+          },
+          {
+            "startDate": "2015-02-18",
+            "endDate": "2015-02-24",
+            "reason": "spring festival",
+            "missingDays": 5
+          },
+          {
+            "startDate": "2015-10-01",
+            "endDate": "2015-10-07",
+            "reason": "national day",
+            "missingDays": 5
+          },
+          {
+            "startDate": "2016-02-08",
+            "endDate": "2016-02-12",
+            "reason": "spring festival",
+            "missingDays": 5
+          },
+          {
+            "startDate": "2016-10-03",
+            "endDate": "2016-10-07",
+            "reason": "national day",
+            "missingDays": 5
+          },
+          {
+            "startDate": "2017-01-27",
+            "endDate": "2017-02-02",
+            "reason": "spring festival",
+            "missingDays": 5
+          },
+          {
+            "startDate": "2017-10-02",
+            "endDate": "2017-10-06",
+            "reason": "national day",
+            "missingDays": 5
+          },
+          {
+            "startDate": "2018-02-15",
+            "endDate": "2018-02-21",
+            "reason": "spring festival",
+            "missingDays": 5
+          },
+          {
+            "startDate": "2018-10-01",
+            "endDate": "2018-10-05",
+            "reason": "national day",
+            "missingDays": 5
+          },
+          {
+            "startDate": "2019-02-04",
+            "endDate": "2019-02-08",
+            "reason": "spring festival",
+            "missingDays": 5
+          },
+          {
+            "startDate": "2019-10-01",
+            "endDate": "2019-10-07",
+            "reason": "national day",
+            "missingDays": 5
+          },
+          {
+            "startDate": "2020-01-24",
+            "endDate": "2020-01-31",
+            "reason": "spring festival",
+            "missingDays": 6
+          },
+          {
+            "startDate": "2020-10-01",
+            "endDate": "2020-10-08",
+            "reason": "national day",
+            "missingDays": 6
+          },
+          {
+            "startDate": "2021-02-11",
+            "endDate": "2021-02-17",
+            "reason": "spring festival",
+            "missingDays": 5
+          },
+          {
+            "startDate": "2021-10-01",
+            "endDate": "2021-10-07",
+            "reason": "national day",
+            "missingDays": 5
+          },
+          {
+            "startDate": "2022-01-31",
+            "endDate": "2022-02-04",
+            "reason": "spring festival",
+            "missingDays": 5
+          },
+          {
+            "startDate": "2022-10-03",
+            "endDate": "2022-10-07",
+            "reason": "national day",
+            "missingDays": 5
+          },
+          {
+            "startDate": "2023-01-23",
+            "endDate": "2023-01-27",
+            "reason": "spring festival",
+            "missingDays": 5
+          },
+          {
+            "startDate": "2023-09-29",
+            "endDate": "2023-10-06",
+            "reason": "national day",
+            "missingDays": 6
+          },
+          {
+            "startDate": "2024-02-09",
+            "endDate": "2024-02-16",
+            "reason": "spring festival",
+            "missingDays": 6
+          },
+          {
+            "startDate": "2024-10-01",
+            "endDate": "2024-10-07",
+            "reason": "national day",
+            "missingDays": 5
+          },
+          {
+            "startDate": "2025-01-28",
+            "endDate": "2025-02-04",
+            "reason": "spring festival",
+            "missingDays": 6
+          },
+          {
+            "startDate": "2025-10-01",
+            "endDate": "2025-10-08",
+            "reason": "national day",
+            "missingDays": 6
+          },
+          {
+            "startDate": "2026-02-16",
+            "endDate": "2026-02-23",
+            "reason": "spring festival",
+            "missingDays": 6
+          }
+        ],
+        "fieldCoverage": {
+          "open": 1,
+          "high": 1,
+          "low": 1,
+          "close": 1,
+          "volume": 1
+        },
+        "issueCount": 1,
+        "hasSuspiciousGaps": false,
+        "message": "确认 26 段停市区间"
       }
     }
   ]

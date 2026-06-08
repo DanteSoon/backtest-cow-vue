@@ -20,10 +20,16 @@ const activePath = computed(() => {
   <div class="shell">
     <aside class="shell__sidebar">
       <div class="shell__brand">
-        <div class="shell__logo">牛</div>
+        <div class="shell__logo">
+          牛
+        </div>
         <div>
-          <div class="shell__title">回测牛</div>
-          <div class="shell__subtitle">本地回测分析工作台</div>
+          <div class="shell__title">
+            回测牛
+          </div>
+          <div class="shell__subtitle">
+            本地回测分析工作台
+          </div>
         </div>
       </div>
       <nav class="shell__nav">
@@ -42,8 +48,12 @@ const activePath = computed(() => {
     <main class="shell__main">
       <header class="shell__header">
         <div>
-          <div class="shell__eyebrow">指数浏览 · 汇率换算 · 回测分析</div>
-          <h1 class="shell__headline">{{ route.meta.title ?? '回测牛' }}</h1>
+          <div class="shell__eyebrow">
+            指数浏览 · 汇率换算 · 回测分析
+          </div>
+          <h1 class="shell__headline">
+            {{ route.meta.title ?? '回测牛' }}
+          </h1>
         </div>
       </header>
       <section class="shell__content">

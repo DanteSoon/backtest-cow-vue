@@ -4,6 +4,7 @@ import { assessSeriesQuality, dedupeAndSortSeries, round } from './data-quality.
 
 const ROOT = process.cwd()
 const PUBLIC_DATA_DIR = path.join(ROOT, 'public', 'data')
+const TEMP_DATA_DIR = path.join(ROOT, '.tmp', 'data-update')
 
 const INDEX_CONFIG = {
   SPX: {
@@ -60,20 +61,80 @@ const INDEX_CONFIG = {
     description: 'A 股中盘风格核心指数，兼顾成长与周期属性。',
     source: 'eastmoney',
   },
+  SHCOMP: {
+    name: '上证指数',
+    shortName: '上证指数',
+    market: 'CN',
+    currency: 'CNY',
+    symbol: '1.000001',
+    description: '上海证券交易所最具代表性的宽基指数之一，反映沪市整体表现。',
+    source: 'eastmoney',
+  },
+  SZCOMP: {
+    name: '深证成指',
+    shortName: '深证成指',
+    market: 'CN',
+    currency: 'CNY',
+    symbol: '0.399001',
+    description: '深圳市场核心成份指数，兼具成长与制造业权重特征。',
+    source: 'eastmoney',
+  },
+  CHINEXT: {
+    name: '创业板指',
+    shortName: '创业板指',
+    market: 'CN',
+    currency: 'CNY',
+    symbol: '0.399006',
+    description: '创业板核心指数，风格偏成长，波动和景气弹性通常更高。',
+    source: 'eastmoney',
+  },
+  STAR50: {
+    name: '科创50指数',
+    shortName: '科创50',
+    market: 'CN',
+    currency: 'CNY',
+    symbol: '1.000688',
+    description: '科创板代表性指数，聚焦硬科技龙头与高研发企业。',
+    source: 'eastmoney',
+  },
+  GOLD_ETF: {
+    name: '华安黄金ETF',
+    shortName: '黄金ETF',
+    market: 'CN',
+    currency: 'CNY',
+    symbol: '1.518880',
+    description: '国内成交活跃的黄金 ETF，可作为人民币计价黄金资产代理。',
+    source: 'eastmoney',
+  },
 }
 
 const ensureDir = async (dir) => fs.mkdir(dir, { recursive: true })
 
-const fetchJson = async (url) => {
-  const response = await fetch(url, {
-    headers: {
-      'user-agent': 'Mozilla/5.0',
-    },
-  })
-  if (!response.ok) {
-    throw new Error(`Failed to fetch ${url}: ${response.status}`)
+const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms))
+
+const fetchJson = async (url, retries = 3) => {
+  let lastError
+
+  for (let attempt = 0; attempt < retries; attempt += 1) {
+    try {
+      const response = await fetch(url, {
+        headers: {
+          'user-agent': 'Mozilla/5.0',
+        },
+      })
+      if (!response.ok) {
+        throw new Error(`Failed to fetch ${url}: ${response.status}`)
+      }
+      return response.json()
+    } catch (error) {
+      lastError = error
+      if (attempt < retries - 1) {
+        await sleep(500 * (attempt + 1))
+      }
+    }
   }
-  return response.json()
+
+  throw lastError
 }
 
 const fetchYahooSeries = async (symbol) => {
@@ -131,6 +192,32 @@ const fetchEastmoneySeries = async (symbol) => {
   })
 }
 
+const fetchSinaSeries = async (symbol) => {
+  const url = `https://quotes.sina.cn/cn/api/json_v2.php/CN_MarketDataService.getKLineData?symbol=${encodeURIComponent(symbol)}&scale=240&ma=no&datalen=1023`
+  const json = await fetchJson(url)
+  return (Array.isArray(json) ? json : []).map((item) => ({
+    date: String(item.day),
+    open: round(Number(item.open), 4),
+    high: round(Number(item.high), 4),
+    low: round(Number(item.low), 4),
+    close: round(Number(item.close), 4),
+    volume: Number.isFinite(Number(item.volume)) ? round(Number(item.volume), 2) : null,
+  }))
+}
+
+const fetchIndexSeriesBySource = async (config) => {
+  switch (config.source) {
+    case 'yahoo':
+      return fetchYahooSeries(config.symbol)
+    case 'eastmoney':
+      return fetchEastmoneySeries(config.symbol)
+    case 'sina':
+      return fetchSinaSeries(config.symbol)
+    default:
+      throw new Error(`Unsupported source: ${config.source}`)
+  }
+}
+
 const buildManifestEntry = (code, config, series) => ({
   code,
   name: config.name,
@@ -157,9 +244,23 @@ const fetchUsdCnySeries = async () => {
   }))
 }
 
+const writeJson = async (file, value) => {
+  await ensureDir(path.dirname(file))
+  await fs.writeFile(file, JSON.stringify(value, null, 2))
+}
+
+const replaceDir = async (sourceDir, targetDir) => {
+  const backupDir = `${targetDir}.bak`
+  await fs.rm(backupDir, { recursive: true, force: true })
+  await fs.rename(targetDir, backupDir).catch(() => {})
+  await fs.rename(sourceDir, targetDir)
+  await fs.rm(backupDir, { recursive: true, force: true })
+}
+
 const main = async () => {
-  await ensureDir(path.join(PUBLIC_DATA_DIR, 'indices'))
-  await ensureDir(path.join(PUBLIC_DATA_DIR, 'fx'))
+  await fs.rm(TEMP_DATA_DIR, { recursive: true, force: true })
+  await ensureDir(path.join(TEMP_DATA_DIR, 'indices'))
+  await ensureDir(path.join(TEMP_DATA_DIR, 'fx'))
 
   const manifest = {
     updatedAt: new Date().toISOString(),
@@ -168,26 +269,20 @@ const main = async () => {
   }
 
   for (const [code, config] of Object.entries(INDEX_CONFIG)) {
-    const rawSeries =
-      config.source === 'yahoo'
-        ? await fetchYahooSeries(config.symbol)
-        : await fetchEastmoneySeries(config.symbol)
+    const rawSeries = await fetchIndexSeriesBySource(config)
     const series = dedupeAndSortSeries(rawSeries)
     if (series.length === 0) {
       throw new Error(`No series data for ${code}`)
     }
-    await fs.writeFile(
-      path.join(PUBLIC_DATA_DIR, 'indices', `${code}.json`),
-      JSON.stringify(series, null, 2),
-    )
+    await writeJson(path.join(TEMP_DATA_DIR, 'indices', `${code}.json`), series)
     manifest.indices.push(buildManifestEntry(code, config, series))
   }
 
   const fxSeries = await fetchUsdCnySeries()
+  await writeJson(path.join(TEMP_DATA_DIR, 'fx', 'usd-cny.json'), fxSeries)
+  await writeJson(path.join(TEMP_DATA_DIR, 'manifest.json'), manifest)
 
-  await fs.writeFile(path.join(PUBLIC_DATA_DIR, 'fx', 'usd-cny.json'), JSON.stringify(fxSeries, null, 2))
-  await fs.writeFile(path.join(PUBLIC_DATA_DIR, 'manifest.json'), JSON.stringify(manifest, null, 2))
-
+  await replaceDir(TEMP_DATA_DIR, PUBLIC_DATA_DIR)
   console.log(`Generated manifest with ${manifest.indices.length} indices and ${fxSeries.length} fx points.`)
 }
 

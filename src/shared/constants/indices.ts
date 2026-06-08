@@ -1,6 +1,18 @@
 import type { DataQualitySummary, IndexCode, IndexMeta } from '@/shared/types/domain'
 
-export const INDEX_ORDER: IndexCode[] = ['SPX', 'NDX', 'DJI', 'RUT', 'CSI300', 'CSI500']
+export const INDEX_ORDER: IndexCode[] = [
+  'SPX',
+  'NDX',
+  'DJI',
+  'RUT',
+  'SHCOMP',
+  'SZCOMP',
+  'CSI300',
+  'CSI500',
+  'CHINEXT',
+  'STAR50',
+  'GOLD_ETF',
+]
 
 const emptyQuality: DataQualitySummary = {
   validationStatus: 'warning',
@@ -91,6 +103,61 @@ export const INDEX_META_MAP: Record<
       sourceSymbol: '1.000905',
       tradingCalendar: 'CN',
       description: 'A 股中盘风格核心指数，兼顾成长与周期属性。',
+    },
+    SHCOMP: {
+      code: 'SHCOMP',
+      name: '上证指数',
+      shortName: '上证指数',
+      market: 'CN',
+      currency: 'CNY',
+      source: 'eastmoney',
+      sourceSymbol: '1.000001',
+      tradingCalendar: 'CN',
+      description: '上海证券交易所最具代表性的宽基指数之一，反映沪市整体表现。',
+    },
+    SZCOMP: {
+      code: 'SZCOMP',
+      name: '深证成指',
+      shortName: '深证成指',
+      market: 'CN',
+      currency: 'CNY',
+      source: 'eastmoney',
+      sourceSymbol: '0.399001',
+      tradingCalendar: 'CN',
+      description: '深圳市场核心成份指数，兼具成长与制造业权重特征。',
+    },
+    CHINEXT: {
+      code: 'CHINEXT',
+      name: '创业板指',
+      shortName: '创业板指',
+      market: 'CN',
+      currency: 'CNY',
+      source: 'eastmoney',
+      sourceSymbol: '0.399006',
+      tradingCalendar: 'CN',
+      description: '创业板核心指数，风格偏成长，波动和景气弹性通常更高。',
+    },
+    STAR50: {
+      code: 'STAR50',
+      name: '科创50指数',
+      shortName: '科创50',
+      market: 'CN',
+      currency: 'CNY',
+      source: 'eastmoney',
+      sourceSymbol: '1.000688',
+      tradingCalendar: 'CN',
+      description: '科创板代表性指数，聚焦硬科技龙头与高研发企业。',
+    },
+    GOLD_ETF: {
+      code: 'GOLD_ETF',
+      name: '华安黄金ETF',
+      shortName: '黄金ETF',
+      market: 'CN',
+      currency: 'CNY',
+      source: 'eastmoney',
+      sourceSymbol: '1.518880',
+      tradingCalendar: 'CN',
+      description: '国内成交活跃的黄金 ETF，可作为人民币计价黄金资产代理。',
     },
   }
 

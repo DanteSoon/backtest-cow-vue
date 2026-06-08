@@ -1,16 +1,23 @@
 import dayjs from 'dayjs'
 import type {
+  AssetCurrency,
+  AssetCurvePoint,
+  AssetSummary,
   BacktestCurvePoint,
+  BacktestDataset,
   BacktestParams,
   BacktestResult,
   BenchmarkCurvePoint,
   DcaParams,
+  DcaPortfolioLeg,
   ExecutedTrade,
   ExcessReturnPoint,
   FxPoint,
   HoldingMetricPoint,
+  IndexCode,
   ManualParams,
   PricePoint,
+  ResolvedDateRange,
   RiskMetrics,
   YearlyMetric,
 } from '@/shared/types/domain'
@@ -26,9 +33,30 @@ interface CurveBuildPoint {
   dailyFlowCny: number
 }
 
+interface AssetState {
+  indexCode: IndexCode
+  units: number
+  investedCny: number
+}
+
+interface PreparedSeries {
+  indexCode: IndexCode
+  currency: AssetCurrency
+  series: PricePoint[]
+  seriesMap: Map<string, PricePoint>
+}
+
 interface CurveBuildResult {
   curve: CurveBuildPoint[]
   trades: ExecutedTrade[]
+  assetCurves: AssetCurvePoint[]
+  assetSummaries: AssetSummary[]
+  resolvedRange: ResolvedDateRange
+}
+
+interface PlannedTrade {
+  indexCode: IndexCode
+  grossAmountCny: number
 }
 
 const applyBuyCost = (value: number, feeRate: number, feeFixed: number, slippageBps: number) =>
@@ -39,14 +67,84 @@ const applySellProceeds = (value: number, feeRate: number, feeFixed: number, sli
 
 const toCny = (value: number, fx: number) => value * fx
 
-const buildDcaSchedule = (params: DcaParams, series: PricePoint[]) => {
+const getSeriesOrThrow = (dataset: BacktestDataset, code: IndexCode) => {
+  const series = dataset.seriesByCode[code]
+  if (!series || series.length === 0) {
+    throw new Error(`${code} 指数数据为空，无法执行回测`)
+  }
+  return sortByDate(series)
+}
+
+const getCurrencyOrThrow = (dataset: BacktestDataset, code: IndexCode): AssetCurrency => {
+  const currency = dataset.currencyByCode[code]
+  if (!currency) {
+    throw new Error(`${code} 缺少币种信息`)
+  }
+  return currency
+}
+
+const prepareSeries = (dataset: BacktestDataset, codes: IndexCode[]): PreparedSeries[] =>
+  [...new Set(codes)].map((indexCode) => {
+    const series = getSeriesOrThrow(dataset, indexCode)
+    return {
+      indexCode,
+      currency: getCurrencyOrThrow(dataset, indexCode),
+      series,
+      seriesMap: new Map(series.map((point) => [point.date, point])),
+    }
+  })
+
+const getRequestedEndDate = (params: DcaParams) =>
+  params.dateMode === 'start-duration'
+    ? dayjs(params.startDate).add(params.durationYears, 'year').format('YYYY-MM-DD')
+    : params.endDate
+
+const getRequestedStartDate = (params: DcaParams) =>
+  params.dateMode === 'end-recent'
+    ? dayjs(params.endDate).subtract(params.recentYears, 'year').add(1, 'day').format('YYYY-MM-DD')
+    : params.startDate
+
+const resolveDcaRange = (params: DcaParams, prepared: PreparedSeries[]): ResolvedDateRange => {
+  const commonStartDate = prepared
+    .map((item) => item.series[0]?.date)
+    .filter(Boolean)
+    .sort()
+    .at(-1)
+  const commonEndDate = prepared
+    .map((item) => item.series.at(-1)?.date)
+    .filter(Boolean)
+    .sort()[0]
+
+  if (!commonStartDate || !commonEndDate) {
+    throw new Error('组合中存在缺失数据的指数，无法解析回测区间')
+  }
+
+  const requestedStartDate = getRequestedStartDate(params)
+  const requestedEndDate = getRequestedEndDate(params)
+  const startDate = requestedStartDate > commonStartDate ? requestedStartDate : commonStartDate
+  const endDate = requestedEndDate < commonEndDate ? requestedEndDate : commonEndDate
+
+  if (dayjs(startDate).isAfter(dayjs(endDate), 'day')) {
+    throw new Error('可回测区间为空，请调整日期模式或指数范围')
+  }
+
+  return {
+    startDate,
+    endDate,
+    label:
+      params.dateMode === 'start-duration'
+        ? `从 ${startDate} 开始，持续 ${params.durationYears} 年`
+        : `截止 ${endDate}，回看近 ${params.recentYears} 年`,
+  }
+}
+
+const buildDcaTargets = (params: DcaParams, range: ResolvedDateRange) => {
   const dates: string[] = []
-  let cursor = dayjs(params.startDate)
-  const endDate = dayjs(params.endDate)
+  let cursor = dayjs(range.startDate)
+  const endDate = dayjs(range.endDate)
 
   while (!cursor.isAfter(endDate, 'day')) {
-    const point = findFirstTradingDateOnOrAfter(cursor.format('YYYY-MM-DD'), series)
-    if (point && !dayjs(point.date).isAfter(endDate, 'day')) dates.push(point.date)
+    dates.push(cursor.format('YYYY-MM-DD'))
 
     switch (params.frequency) {
       case 'daily':
@@ -64,36 +162,128 @@ const buildDcaSchedule = (params: DcaParams, series: PricePoint[]) => {
     }
   }
 
-  return [...new Set(dates)]
+  return dates
 }
 
-const validateParams = (params: BacktestParams, series: PricePoint[], fxSeries: FxPoint[], currency: 'USD' | 'CNY') => {
-  if (series.length === 0) {
-    throw new Error('指数数据为空，无法执行回测')
+const normalizePortfolio = (params: DcaParams): DcaPortfolioLeg[] => {
+  const normalized = params.portfolio
+    .filter((item) => item.indexCode)
+    .map((item) => ({
+      indexCode: item.indexCode,
+      ratio: Number(item.ratio ?? 0),
+      amountCny: Number(item.amountCny ?? 0),
+    }))
+
+  if (normalized.length === 0) {
+    throw new Error('请至少选择一个定投标的')
   }
 
+  return normalized
+}
+
+const getLegAmount = (params: DcaParams, leg: DcaPortfolioLeg, ratioBase: number) => {
+  if (params.allocationMode === 'amount') return leg.amountCny
+  return ratioBase === 0 ? 0 : params.periodicTotalAmountCny * (leg.ratio / ratioBase)
+}
+
+const buildTradePlan = (params: DcaParams, prepared: PreparedSeries[], range: ResolvedDateRange) => {
+  const targets = buildDcaTargets(params, range)
+  const ratioBase = params.portfolio.reduce((sum, item) => sum + Math.max(item.ratio, 0), 0)
+  const tradePlan = new Map<string, PlannedTrade[]>()
+
+  for (const leg of params.portfolio) {
+    const preparedSeries = prepared.find((item) => item.indexCode === leg.indexCode)
+    if (!preparedSeries) continue
+    const filteredSeries = preparedSeries.series.filter(
+      (point) => point.date >= range.startDate && point.date <= range.endDate,
+    )
+
+    for (const targetDate of targets) {
+      const amount = getLegAmount(params, leg, ratioBase)
+      if (amount <= 0) continue
+      const point = findFirstTradingDateOnOrAfter(targetDate, filteredSeries)
+      if (!point || point.date > range.endDate) continue
+      const existing = tradePlan.get(point.date) ?? []
+      existing.push({
+        indexCode: leg.indexCode,
+        grossAmountCny: amount,
+      })
+      tradePlan.set(point.date, existing)
+    }
+  }
+
+  return tradePlan
+}
+
+const getUnionDates = (prepared: PreparedSeries[], startDate: string, endDate: string) =>
+  [...new Set(
+    prepared.flatMap((item) =>
+      item.series
+        .filter((point) => point.date >= startDate && point.date <= endDate)
+        .map((point) => point.date),
+    ),
+  )].sort()
+
+const getLatestPointOnOrBefore = (series: PricePoint[], date: string) => {
+  let matched: PricePoint | null = null
+  for (const point of series) {
+    if (point.date > date) break
+    matched = point
+  }
+  return matched
+}
+
+const validateParams = (params: BacktestParams, dataset: BacktestDataset, fxSeries: FxPoint[]) => {
   if (params.kind === 'dca') {
-    if (dayjs(params.startDate).isAfter(dayjs(params.endDate), 'day')) {
-      throw new Error('开始日期不能晚于结束日期')
-    }
-    if (params.amountCny <= 0) {
-      throw new Error('每次投入金额必须大于 0')
-    }
-  } else {
-    if (params.initialCashCny < 0) {
-      throw new Error('初始资金不能为负数')
-    }
-    if (params.trades.length === 0) {
-      throw new Error('请至少提供一笔交易')
-    }
-    const dates = new Set(series.map((item) => item.date))
-    for (const trade of params.trades) {
-      if (!dates.has(trade.date)) {
-        throw new Error(`交易日期 ${trade.date} 不在指数交易日历中`)
+    const portfolio = normalizePortfolio(params)
+    const prepared = prepareSeries(dataset, portfolio.map((item) => item.indexCode))
+    const range = resolveDcaRange(params, prepared)
+
+    if (params.allocationMode === 'ratio') {
+      if (params.periodicTotalAmountCny <= 0) {
+        throw new Error('每期定投总金额必须大于 0')
       }
-      if (trade.value <= 0) {
-        throw new Error(`交易日期 ${trade.date} 的交易值必须大于 0`)
+      if (portfolio.reduce((sum, item) => sum + Math.max(item.ratio, 0), 0) <= 0) {
+        throw new Error('组合占比之和必须大于 0')
       }
+    } else if (portfolio.every((item) => item.amountCny <= 0)) {
+      throw new Error('按金额模式下至少需要一个标的金额大于 0')
+    }
+
+    if (params.dateMode === 'start-duration' && params.durationYears <= 0) {
+      throw new Error('投资时长必须大于 0')
+    }
+    if (params.dateMode === 'end-recent' && params.recentYears <= 0) {
+      throw new Error('近 X 年必须大于 0')
+    }
+
+    const hasUsdAsset = prepared.some((item) => item.currency === 'USD')
+    if (hasUsdAsset && fxSeries.length === 0) {
+      throw new Error('缺少汇率数据，无法执行美元资产回测')
+    }
+    if (hasUsdAsset && fxSeries[0] && range.startDate < fxSeries[0].date) {
+      throw new Error(`当前 USD/CNY 历史汇率从 ${fxSeries[0].date} 开始，美股人民币折算回测请晚于该日期`)
+    }
+
+    return
+  }
+
+  const series = getSeriesOrThrow(dataset, params.indexCode)
+  const currency = getCurrencyOrThrow(dataset, params.indexCode)
+  if (params.initialCashCny < 0) {
+    throw new Error('初始资金不能为负数')
+  }
+  if (params.trades.length === 0) {
+    throw new Error('请至少提供一笔交易')
+  }
+
+  const dates = new Set(series.map((item) => item.date))
+  for (const trade of params.trades) {
+    if (!dates.has(trade.date)) {
+      throw new Error(`交易日期 ${trade.date} 不在指数交易日历中`)
+    }
+    if (trade.value <= 0) {
+      throw new Error(`交易日期 ${trade.date} 的交易值必须大于 0`)
     }
   }
 
@@ -102,77 +292,133 @@ const validateParams = (params: BacktestParams, series: PricePoint[], fxSeries: 
   }
 }
 
-const computeDca = (
-  params: DcaParams,
-  series: PricePoint[],
-  fxSeries: FxPoint[],
-  currency: 'USD' | 'CNY',
-): CurveBuildResult => {
-  const schedule = new Set(buildDcaSchedule(params, series))
-  let units = 0
-  let investedCny = 0
-  const cashCny = 0
+const computeDca = (params: DcaParams, dataset: BacktestDataset, fxSeries: FxPoint[]): CurveBuildResult => {
+  const portfolio = normalizePortfolio(params)
+  const prepared = prepareSeries(dataset, portfolio.map((item) => item.indexCode))
+  const range = resolveDcaRange(params, prepared)
+  const tradePlan = buildTradePlan(
+    {
+      ...params,
+      portfolio,
+    },
+    prepared,
+    range,
+  )
+  const unionDates = getUnionDates(prepared, range.startDate, range.endDate)
+  const assetStateMap = new Map<IndexCode, AssetState>(
+    portfolio.map((item) => [
+      item.indexCode,
+      {
+        indexCode: item.indexCode,
+        units: 0,
+        investedCny: 0,
+      },
+    ]),
+  )
   const trades: ExecutedTrade[] = []
+  const assetCurves: AssetCurvePoint[] = []
+  let totalInvestedCny = 0
 
-  const curve = series
-    .filter(
-      (point) =>
-        !dayjs(point.date).isBefore(params.startDate, 'day') &&
-        !dayjs(point.date).isAfter(params.endDate, 'day'),
-    )
-    .map((point) => {
-      let dailyFlowCny = 0
-      const fx = currency === 'USD' ? alignFxRate(point.date, fxSeries).usdCny : 1
+  const curve = unionDates.map((date) => {
+    let dailyFlowCny = 0
+    const dayTrades = tradePlan.get(date) ?? []
 
-      if (schedule.has(point.date)) {
-        const grossCny = params.amountCny
-        const netCny = applyBuyCost(grossCny, params.feeRate, params.feeFixed, params.slippageBps)
-        const effectiveValue = currency === 'USD' ? netCny / fx : netCny
-        const tradeUnits = effectiveValue / point.close
-        units += tradeUnits
-        investedCny += grossCny
-        dailyFlowCny = grossCny
-        trades.push({
-          date: point.date,
-          side: 'buy',
-          units: tradeUnits,
-          price: point.close,
-          fx,
-        })
-      }
+    for (const trade of dayTrades) {
+      const state = assetStateMap.get(trade.indexCode)
+      const preparedSeries = prepared.find((item) => item.indexCode === trade.indexCode)
+      const point = preparedSeries?.seriesMap.get(date)
+      if (!state || !preparedSeries || !point) continue
 
-      const holdingsValueCny = toCny(units * point.close, fx)
-      return {
-        date: point.date,
-        investedCny,
-        valueCny: holdingsValueCny + cashCny,
-        cashCny,
-        holdingsValueCny,
-        dailyFlowCny,
-      }
-    })
+      const fx = preparedSeries.currency === 'USD' ? alignFxRate(date, fxSeries).usdCny : 1
+      const netAmountCny = applyBuyCost(
+        trade.grossAmountCny,
+        params.feeRate,
+        params.feeFixed,
+        params.slippageBps,
+      )
+      const assetAmount = preparedSeries.currency === 'USD' ? netAmountCny / fx : netAmountCny
+      const units = assetAmount / point.close
+      state.units += units
+      state.investedCny += trade.grossAmountCny
+      totalInvestedCny += trade.grossAmountCny
+      dailyFlowCny += trade.grossAmountCny
 
-  return { curve, trades }
+      trades.push({
+        date,
+        indexCode: trade.indexCode,
+        side: 'buy',
+        units,
+        price: point.close,
+        fx,
+        grossAmountCny: trade.grossAmountCny,
+        netAmountCny,
+      })
+    }
+
+    let holdingsValueCny = 0
+    for (const item of prepared) {
+      const state = assetStateMap.get(item.indexCode)
+      const latestPoint = getLatestPointOnOrBefore(item.series, date)
+      if (!state || !latestPoint) continue
+      const fx = item.currency === 'USD' ? alignFxRate(date, fxSeries).usdCny : 1
+      const valueCny = toCny(state.units * latestPoint.close, fx)
+      holdingsValueCny += valueCny
+      assetCurves.push({
+        date,
+        indexCode: item.indexCode,
+        investedCny: state.investedCny,
+        valueCny,
+        units: state.units,
+      })
+    }
+
+    return {
+      date,
+      investedCny: totalInvestedCny,
+      valueCny: holdingsValueCny,
+      cashCny: 0,
+      holdingsValueCny,
+      dailyFlowCny,
+    }
+  })
+
+  const assetSummaries = portfolio.map((leg) => {
+    const state = assetStateMap.get(leg.indexCode)
+    const lastCurve = [...assetCurves].reverse().find((item) => item.indexCode === leg.indexCode)
+    const investedCny = state?.investedCny ?? 0
+    const endingValueCny = lastCurve?.valueCny ?? 0
+    return {
+      indexCode: leg.indexCode,
+      investedCny,
+      endingValueCny,
+      returnRate: investedCny === 0 ? 0 : endingValueCny / investedCny - 1,
+      tradeCount: trades.filter((trade) => trade.indexCode === leg.indexCode).length,
+    }
+  })
+
+  return {
+    curve,
+    trades,
+    assetCurves,
+    assetSummaries,
+    resolvedRange: range,
+  }
 }
 
-const computeManual = (
-  params: ManualParams,
-  series: PricePoint[],
-  fxSeries: FxPoint[],
-  currency: 'USD' | 'CNY',
-): CurveBuildResult => {
+const computeManual = (params: ManualParams, dataset: BacktestDataset, fxSeries: FxPoint[]): CurveBuildResult => {
+  const series = getSeriesOrThrow(dataset, params.indexCode)
+  const currency = getCurrencyOrThrow(dataset, params.indexCode)
   const tradeMap = new Map(params.trades.map((trade) => [trade.date, trade]))
   let units = 0
   let cashCny = params.initialCashCny
   const investedCny = params.initialCashCny
   const trades: ExecutedTrade[] = []
+  const assetCurves: AssetCurvePoint[] = []
+  const startDate = params.trades[0]?.date ?? series[0].date
+  const endDate = params.trades.at(-1)?.date ?? series.at(-1)?.date ?? startDate
 
   const curve = series
-    .filter(
-      (point) =>
-        !dayjs(point.date).isBefore(params.trades[0]?.date ?? series[0].date, 'day') &&
-        !dayjs(point.date).isAfter(params.trades.at(-1)?.date ?? series.at(-1)?.date, 'day'),
-    )
+    .filter((point) => !dayjs(point.date).isBefore(startDate, 'day') && !dayjs(point.date).isAfter(endDate, 'day'))
     .map((point, index) => {
       const trade = tradeMap.get(point.date)
       const fx = currency === 'USD' ? alignFxRate(point.date, fxSeries).usdCny : 1
@@ -181,21 +427,30 @@ const computeManual = (
       if (trade) {
         const executionPrice = point.close
         if (trade.side === 'buy') {
-          const cashSpend =
+          const grossAmountCny =
             trade.valueMode === 'cash' ? trade.value : trade.value * executionPrice * fx
-          const netSpend = applyBuyCost(
-            cashSpend,
+          const netAmountCny = applyBuyCost(
+            grossAmountCny,
             trade.feeRate ?? params.feeRate,
             trade.feeFixed ?? params.feeFixed,
             trade.slippageBps ?? params.slippageBps,
           )
-          if (cashSpend > cashCny) {
+          if (grossAmountCny > cashCny) {
             throw new Error(`交易日 ${trade.date} 买入金额超过当前现金`)
           }
-          const tradedUnits = (currency === 'USD' ? netSpend / fx : netSpend) / executionPrice
+          const tradedUnits = (currency === 'USD' ? netAmountCny / fx : netAmountCny) / executionPrice
           units += tradedUnits
-          cashCny -= cashSpend
-          trades.push({ date: point.date, side: 'buy', units: tradedUnits, price: executionPrice, fx })
+          cashCny -= grossAmountCny
+          trades.push({
+            date: point.date,
+            indexCode: params.indexCode,
+            side: 'buy',
+            units: tradedUnits,
+            price: executionPrice,
+            fx,
+            grossAmountCny,
+            netAmountCny,
+          })
         } else {
           const unitsToSell =
             trade.valueMode === 'units' ? trade.value : trade.value / fx / executionPrice
@@ -203,20 +458,36 @@ const computeManual = (
             throw new Error('卖出份额超过当前持仓')
           }
           units -= unitsToSell
-          const gross = unitsToSell * executionPrice * fx
-          const net = applySellProceeds(
-            gross,
+          const grossAmountCny = unitsToSell * executionPrice * fx
+          const netAmountCny = applySellProceeds(
+            grossAmountCny,
             trade.feeRate ?? params.feeRate,
             trade.feeFixed ?? params.feeFixed,
             trade.slippageBps ?? params.slippageBps,
           )
-          cashCny += net
-          dailyFlowCny = -net
-          trades.push({ date: point.date, side: 'sell', units: unitsToSell, price: executionPrice, fx })
+          cashCny += netAmountCny
+          dailyFlowCny = -netAmountCny
+          trades.push({
+            date: point.date,
+            indexCode: params.indexCode,
+            side: 'sell',
+            units: unitsToSell,
+            price: executionPrice,
+            fx,
+            grossAmountCny,
+            netAmountCny,
+          })
         }
       }
 
       const holdingsValueCny = toCny(units * point.close, fx)
+      assetCurves.push({
+        date: point.date,
+        indexCode: params.indexCode,
+        investedCny,
+        valueCny: holdingsValueCny,
+        units,
+      })
       return {
         date: point.date,
         investedCny,
@@ -227,34 +498,91 @@ const computeManual = (
       }
     })
 
-  return { curve, trades }
+  return {
+    curve,
+    trades,
+    assetCurves,
+    assetSummaries: [
+      {
+        indexCode: params.indexCode,
+        investedCny,
+        endingValueCny: curve.at(-1)?.valueCny ?? 0,
+        returnRate: investedCny === 0 ? 0 : (curve.at(-1)?.valueCny ?? 0) / investedCny - 1,
+        tradeCount: trades.length,
+      },
+    ],
+    resolvedRange: {
+      startDate,
+      endDate,
+      label: `${startDate} 至 ${endDate}`,
+    },
+  }
 }
 
 const computeBenchmarkCurve = (
   params: BacktestParams,
   curve: CurveBuildPoint[],
-  series: PricePoint[],
+  assetSummaries: AssetSummary[],
+  assetCurves: AssetCurvePoint[],
+  dataset: BacktestDataset,
   fxSeries: FxPoint[],
-  currency: 'USD' | 'CNY',
 ): BenchmarkCurvePoint[] => {
   if (curve.length === 0) return []
 
-  const seriesMap = new Map(series.map((item) => [item.date, item]))
-  const firstPoint = curve[0]
-  const startSeries = seriesMap.get(firstPoint.date) ?? series[0]
-  const fx = currency === 'USD' ? alignFxRate(startSeries.date, fxSeries).usdCny : 1
-  const benchmarkCapital =
-    params.kind === 'dca'
-      ? curve.at(-1)?.investedCny ?? 0
-      : (params as ManualParams).initialCashCny
-  const benchmarkUnits =
-    benchmarkCapital > 0 ? (currency === 'USD' ? benchmarkCapital / fx : benchmarkCapital) / startSeries.close : 0
+  const benchmarkUnits = new Map<IndexCode, number>()
+
+  if (params.kind === 'dca') {
+    for (const item of assetSummaries) {
+      const series = getSeriesOrThrow(dataset, item.indexCode)
+      const currency = getCurrencyOrThrow(dataset, item.indexCode)
+      const startPoint = findFirstTradingDateOnOrAfter(curve[0].date, series) ?? series[0]
+      const fx = currency === 'USD' ? alignFxRate(startPoint.date, fxSeries).usdCny : 1
+      benchmarkUnits.set(
+        item.indexCode,
+        item.investedCny > 0 ? (currency === 'USD' ? item.investedCny / fx : item.investedCny) / startPoint.close : 0,
+      )
+    }
+  } else {
+    const indexCode = (params as ManualParams).indexCode
+    const series = getSeriesOrThrow(dataset, indexCode)
+    const currency = getCurrencyOrThrow(dataset, indexCode)
+    const startPoint = findFirstTradingDateOnOrAfter(curve[0].date, series) ?? series[0]
+    const fx = currency === 'USD' ? alignFxRate(startPoint.date, fxSeries).usdCny : 1
+    benchmarkUnits.set(
+      indexCode,
+      (params as ManualParams).initialCashCny > 0
+        ? (currency === 'USD'
+            ? (params as ManualParams).initialCashCny / fx
+            : (params as ManualParams).initialCashCny) / startPoint.close
+        : 0,
+    )
+  }
+
+  const groupedCurves = new Map<IndexCode, AssetCurvePoint[]>()
+  for (const point of assetCurves) {
+    const bucket = groupedCurves.get(point.indexCode) ?? []
+    bucket.push(point)
+    groupedCurves.set(point.indexCode, bucket)
+  }
 
   let peak = 0
+  const benchmarkCapital =
+    params.kind === 'dca'
+      ? assetSummaries.reduce((sum, item) => sum + item.investedCny, 0)
+      : (params as ManualParams).initialCashCny
+
   return curve.map((item) => {
-    const pricePoint = seriesMap.get(item.date) ?? startSeries
-    const rate = currency === 'USD' ? alignFxRate(item.date, fxSeries).usdCny : 1
-    const valueCny = benchmarkUnits * pricePoint.close * rate
+    let valueCny = 0
+
+    for (const [indexCode, units] of benchmarkUnits.entries()) {
+      const series = getSeriesOrThrow(dataset, indexCode)
+      const currency = getCurrencyOrThrow(dataset, indexCode)
+      const latestPoint = getLatestPointOnOrBefore(series, item.date)
+      if (!latestPoint) continue
+      const fx = currency === 'USD' ? alignFxRate(item.date, fxSeries).usdCny : 1
+      valueCny += units * latestPoint.close * fx
+    }
+
     peak = Math.max(peak, valueCny)
     return {
       date: item.date,
@@ -348,45 +676,45 @@ const computeYearlyMetrics = (curve: BacktestCurvePoint[], benchmarkCurve: Bench
     map.set(year, bucket)
   }
 
-  return [...map.entries()].map(([year, bucket]) => {
-    const first = bucket.points[0]
-    const last = bucket.points.at(-1) ?? first
-    const firstBenchmark = bucket.benchmark[0]
-    const lastBenchmark = bucket.benchmark.at(-1) ?? firstBenchmark
-    const investedStart = first?.investedCny ?? 0
-    const investedEnd = last?.investedCny ?? investedStart
-    const investedCny = investedEnd - investedStart
-    const baselineValue = first?.valueCny ?? 0
-    const benchmarkBaselineValue = firstBenchmark?.valueCny ?? 0
-    const strategyReturnRate = baselineValue === 0 ? 0 : (last?.valueCny ?? 0) / baselineValue - 1
-    const benchmarkReturnRate =
-      benchmarkBaselineValue === 0 ? 0 : (lastBenchmark?.valueCny ?? 0) / benchmarkBaselineValue - 1
-    return {
-      year,
-      investedCny,
-      endingValueCny: last?.valueCny ?? 0,
-      profitCny: (last?.valueCny ?? 0) - (first?.valueCny ?? 0) - investedCny,
-      returnRate: strategyReturnRate,
-      benchmarkReturnRate,
-      excessReturnRate: strategyReturnRate - benchmarkReturnRate,
-      maxDrawdown: Math.min(...bucket.points.map((item) => item.drawdown), 0),
-    }
-  })
+  return [...map.entries()]
+    .sort(([left], [right]) => left - right)
+    .map(([year, bucket]) => {
+      const first = bucket.points[0]
+      const last = bucket.points.at(-1) ?? first
+      const firstBenchmark = bucket.benchmark[0]
+      const lastBenchmark = bucket.benchmark.at(-1) ?? firstBenchmark
+      const investedStart = first?.investedCny ?? 0
+      const investedEnd = last?.investedCny ?? investedStart
+      const investedCny = investedEnd - investedStart
+      const baselineValue = first?.valueCny ?? 0
+      const benchmarkBaselineValue = firstBenchmark?.valueCny ?? 0
+      const strategyReturnRate = baselineValue === 0 ? 0 : (last?.valueCny ?? 0) / baselineValue - 1
+      const benchmarkReturnRate =
+        benchmarkBaselineValue === 0 ? 0 : (lastBenchmark?.valueCny ?? 0) / benchmarkBaselineValue - 1
+      return {
+        year,
+        investedCny,
+        endingValueCny: last?.valueCny ?? 0,
+        profitCny: (last?.valueCny ?? 0) - (first?.valueCny ?? 0) - investedCny,
+        returnRate: strategyReturnRate,
+        benchmarkReturnRate,
+        excessReturnRate: strategyReturnRate - benchmarkReturnRate,
+        maxDrawdown: Math.min(...bucket.points.map((item) => item.drawdown), 0),
+      }
+    })
 }
 
 export const runBacktestEngine = (
   params: BacktestParams,
-  series: PricePoint[],
+  dataset: BacktestDataset,
   fxSeries: FxPoint[],
-  currency: 'USD' | 'CNY',
 ): BacktestResult => {
-  validateParams(params, series, fxSeries, currency)
-  const { curve: curveBase, trades } =
-    params.kind === 'dca'
-      ? computeDca(params, series, fxSeries, currency)
-      : computeManual(params, series, fxSeries, currency)
+  validateParams(params, dataset, fxSeries)
+
+  const { curve: curveBase, trades, assetCurves, assetSummaries, resolvedRange } =
+    params.kind === 'dca' ? computeDca(params, dataset, fxSeries) : computeManual(params, dataset, fxSeries)
   const sortedBase = sortByDate(curveBase)
-  const benchmarkBase = computeBenchmarkCurve(params, sortedBase, series, fxSeries, currency)
+  const benchmarkBase = computeBenchmarkCurve(params, sortedBase, assetSummaries, assetCurves, dataset, fxSeries)
   const sortedBenchmark = sortByDate(benchmarkBase)
   let peak = 0
   let benchmarkPeak = 0
@@ -402,8 +730,7 @@ export const runBacktestEngine = (
       benchmarkValueCny: benchmark?.valueCny ?? 0,
       excessValueCny: item.valueCny - (benchmark?.valueCny ?? 0),
       drawdown: peak === 0 ? 0 : item.valueCny / peak - 1,
-      benchmarkDrawdown:
-        benchmarkPeak === 0 ? 0 : (benchmark?.valueCny ?? 0) / benchmarkPeak - 1,
+      benchmarkDrawdown: benchmarkPeak === 0 ? 0 : (benchmark?.valueCny ?? 0) / benchmarkPeak - 1,
       cashCny: item.cashCny,
       holdingsValueCny: item.holdingsValueCny,
       positionRatio: item.valueCny === 0 ? 0 : item.holdingsValueCny / item.valueCny,
@@ -432,7 +759,7 @@ export const runBacktestEngine = (
   const riskMetrics = computeRiskMetrics(curve, yearly)
   const cashflows =
     params.kind === 'dca'
-      ? trades.map((trade) => ({ date: trade.date, amount: -((params as DcaParams).amountCny ?? 0) }))
+      ? trades.map((trade) => ({ date: trade.date, amount: -trade.grossAmountCny }))
       : [
           {
             date: curve[0]?.date ?? new Date().toISOString().slice(0, 10),
@@ -497,5 +824,8 @@ export const runBacktestEngine = (
     holdingMetrics,
     riskMetrics,
     executedTrades: trades,
+    assetCurves,
+    assetSummaries,
+    resolvedRange,
   }
 }

@@ -1,5 +1,5 @@
 import { ref } from 'vue'
-import type { BacktestParams, FxPoint, PricePoint } from '@/shared/types/domain'
+import type { BacktestDataset, BacktestParams, FxPoint } from '@/shared/types/domain'
 import { runBacktestEngine } from '@/shared/utils/backtest-engine'
 
 export const useBacktestWorker = () => {
@@ -8,15 +8,14 @@ export const useBacktestWorker = () => {
 
   const runBacktest = async (
     params: BacktestParams,
-    series: PricePoint[],
+    dataset: BacktestDataset,
     fxSeries: FxPoint[],
-    currency: 'USD' | 'CNY',
   ) => {
     loading.value = true
     error.value = null
 
     try {
-      const result = await Promise.resolve(runBacktestEngine(params, series, fxSeries, currency))
+      const result = await Promise.resolve(runBacktestEngine(params, dataset, fxSeries))
       return result
     } catch (reason) {
       error.value = reason instanceof Error ? reason.message : '回测失败'

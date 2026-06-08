@@ -1,4 +1,5 @@
-import { use } from 'echarts/core'
+import { registerLocale, use } from 'echarts/core'
+import zhLocale from 'echarts/i18n/langZH-obj.js'
 import { CanvasRenderer } from 'echarts/renderers'
 import {
   BarChart,
@@ -10,6 +11,7 @@ import {
   GridComponent,
   LegendComponent,
   MarkLineComponent,
+  ToolboxComponent,
   TitleComponent,
   TooltipComponent,
 } from 'echarts/components'
@@ -25,4 +27,11 @@ use([
   LegendComponent,
   DataZoomComponent,
   MarkLineComponent,
+  ToolboxComponent,
 ])
+
+registerLocale('ZH', zhLocale)
+
+export const echartsInitOptions = {
+  locale: 'ZH',
+}
